@@ -1,5 +1,15 @@
+import { useRouter } from 'next/router';
+
 const AdminSidebar = () => {
   
+  const router = useRouter()
+
+  const isLoginPage = router.pathname === '/'
+
+  if(isLoginPage) {
+    return null
+  }
+
   return (
     <aside className="main-sidebar sidebar-dark-primary elevation-4">
       {/* Brand Logo */}
@@ -65,7 +75,7 @@ const AdminSidebar = () => {
               </a>
               <ul className="nav nav-treeview">
                 <li className="nav-item">
-                  <a href="/" className="nav-link">
+                  <a href="/home" className="nav-link">
                     <i className="far fa-circle nav-icon" />
                     <p>Home</p>
                   </a>
@@ -80,6 +90,12 @@ const AdminSidebar = () => {
                   <a href="/about_us" className="nav-link">
                     <i className="far fa-circle nav-icon" />
                     <p>About Us</p>
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a href="/ajla" className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Ajla</p>
                   </a>
                 </li>
                 <li className="nav-item">
@@ -99,7 +115,7 @@ const AdminSidebar = () => {
                   </a>
                   </li>
                   <li className="nav-item">
-                    <a href="/login" className="nav-link">
+                    <a href="/" className="nav-link">
                       <i className="far fa-circle nav-icon" />
                       <p>Login</p>
                     </a>

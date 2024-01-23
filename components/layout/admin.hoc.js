@@ -8,7 +8,7 @@ export default class AdminHOC extends Component {
   render() {
     return (
       <div>
-        <AdminHeader />
+        {this.props.showHeader && <AdminHeader />}
         <AdminSidebar />
         <AdminContent title={this.props.contentTitle}>
           {this.props.children}

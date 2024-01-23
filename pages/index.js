@@ -1,269 +1,161 @@
-import React from "react";
-import index from "../styles/index.module.scss";
-import AdminHeader from "@/components/layout/admin.header";
-import AdminSidebar from "@/components/layout/admin.menu";
-import AdminFooter from "@/components/layout/admin.footer";
-import AdminHOC from "@/components/layout/admin.hoc";
+// This component represents a login page with a form for users to input their email and password. 
 
-export default function Home() {
+import React, { useState } from "react";
+import Image from "next/image";
+import AdminHOC from "@/components/layout/admin.hoc";
+import { useRouter } from "next/router"; // import using bulit-in nextjs router
+
+// The Login component is a functional component that represents the login page for the website
+export default function Login() {
+
+// Next.js Router:
+  /* The useRouter hook from Next.js is used to access the router object. 
+  It provides methods for navigation, such as push for changing the URL programmatically. */
+  const router = useRouter();
+
+// State Initialization:
+  // The component uses the useState hook to manage the state of the email and password input fields.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+// Form Submission Handler:
+  /* The handleSubmit function is triggered when the login form is submitted. 
+  It prevents the default form submission behavior, sends a POST request to the "/api/loginAuthentication" endpoint with user credentials, and handles the response. 
+  If the response is successful (status code 200), it navigates the user to the "/home" page using router.push. Otherwise, it shows an alert for invalid credentials.*/
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // calling the API using javasript fetch
+    // Fetching login authentication API with user input
+    try {
+      const response = await fetch("/api/loginAuthentication", {
+        method: "Post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+
+        // Call the function to send user data to the server
+        sendUserDataToServer(userData);
+
+        // Navigate to the "/home" page
+        router.push("/home");
+      } else {
+        alert("Invalid Email or Password");
+      }
+    } catch (error) {
+      console.error("Error", error);
+    }
+  };
+
+  const sendUserDataToServer = async (userData) => {
+    try {
+      const response = await fetch("/api/saveUserData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        console.log("User data sent to the server successfully");
+        // Optionally, handle the server response here
+      } else {
+        console.error("Failed to send user data to the server:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error sending user data to the server:", error);
+    }
+  };
+
   return (
-    <AdminHOC contentTitle="Home">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-lg-6">
-            <div className="card">
-              <div className="card-header border-0">
-                <div className="d-flex justify-content-between">
-                  <h3 className="card-title">Online Store Visitors</h3>
-                  <a href="javascript:void(0);">View Report</a>
+      <div className="hold-transition login-page">
+        <div className="login-box">
+          {/* /.login-logo */}
+          <div className="card">
+            <div className="card-body login-card-body">
+              <p className="login-box-msg">Sign in to start your session</p>
+              <form onSubmit={handleSubmit}>
+                <div className="input-group mb-3">
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <div className="input-group-append">
+                    <div className="input-group-text">
+                      <span className="fas fa-envelope" />
+                    </div>
+                  </div>
+                </div>
+                <div className="input-group mb-3">
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <div className="input-group-append">
+                    <div className="input-group-text">
+                      <span className="fas fa-lock" />
+                    </div>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-8">
+                    <div className="icheck-primary">
+                      <input type="checkbox" id="remember" />
+                      <label htmlFor="remember">Remember Me</label>
+                    </div>
+                  </div>
+                  {/* /.col */}
+                  <div className="col-4">
+                    <button
+                      type="submit"
+                      onClick={handleSubmit}
+                      className="btn btn-primary btn-block"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                  {/* /.col */}
+                </div>
+              </form>
+              <div className="social-auth-links text-center mb-3">
+                <p>- OR -</p>
+                <a href="/" className="btn btn-block btn-primary">
+                  <i className="fab fa-facebook mr-2" /> Sign in using Facebook
+                </a>
+                {/* <!-- Add this where you want the Google Sign-In button --> */}
+              <div class="g-signin2" data-onsuccess="onSignIn">
+                <a href="https://accounts.google.com/o/oauth2/auth?client_id=159004253172-lvtift0t6q21017qc3pqibtvr0pph999.apps.googleusercontent.com&redirect_uri=http://localhost:3000&response_type=code&scope=email" className="btn btn-block btn-danger">
+                  <i className="fab fa-google-plus mr-2" /> Sign in using
+                  Google+
+                </a>
+                
                 </div>
               </div>
-              <div className="card-body">
-                <div className="d-flex">
-                  <p className="d-flex flex-column">
-                    <span className="text-bold text-lg">820</span>
-                    <span>Visitors Over Time</span>
-                  </p>
-                  <p className="ml-auto d-flex flex-column text-right">
-                    <span className="text-success">
-                      <i className="fas fa-arrow-up" /> 12.5%
-                    </span>
-                    <span className="text-muted">Since last week</span>
-                  </p>
-                </div>
-                {/* /.d-flex */}
-                <div className="position-relative mb-4">
-                  <canvas id="visitors-chart" height={200} />
-                </div>
-                <div className="d-flex flex-row justify-content-end">
-                  <span className="mr-2">
-                    <i className="fas fa-square text-primary" /> This Week
-                  </span>
-                  <span>
-                    <i className="fas fa-square text-gray" /> Last Week
-                  </span>
-                </div>
-              </div>
+              {/* /.social-auth-links */}
+              <p className="mb-1">
+                <a href="forgot-password.html">I forgot my password</a>
+              </p>
+              <p className="mb-0">
+                <a href="register.html" className="text-center">
+                  Register a new membership
+                </a>
+              </p>
             </div>
-            {/* /.card */}
-            <div className="card">
-              <div className="card-header border-0">
-                <h3 className="card-title">Products</h3>
-                <div className="card-tools">
-                  <a href="#" className="btn btn-tool btn-sm">
-                    <i className="fas fa-download" />
-                  </a>
-                  <a href="#" className="btn btn-tool btn-sm">
-                    <i className="fas fa-bars" />
-                  </a>
-                </div>
-              </div>
-              <div className="card-body table-responsive p-0">
-                <table className="table table-striped table-valign-middle">
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Price</th>
-                      <th>Sales</th>
-                      <th>More</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <img
-                          src="static/dist/img/default-150x150.png"
-                          alt="Product 1"
-                          className="img-circle img-size-32 mr-2"
-                        />
-                        Some Product
-                      </td>
-                      <td>$13 USD</td>
-                      <td>
-                        <small className="text-success mr-1">
-                          <i className="fas fa-arrow-up" />
-                          12%
-                        </small>
-                        12,000 Sold
-                      </td>
-                      <td>
-                        <a href="#" className="text-muted">
-                          <i className="fas fa-search" />
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src="static/dist/img/default-150x150.png"
-                          alt="Product 1"
-                          className="img-circle img-size-32 mr-2"
-                        />
-                        Another Product
-                      </td>
-                      <td>$29 USD</td>
-                      <td>
-                        <small className="text-warning mr-1">
-                          <i className="fas fa-arrow-down" />
-                          0.5%
-                        </small>
-                        123,234 Sold
-                      </td>
-                      <td>
-                        <a href="#" className="text-muted">
-                          <i className="fas fa-search" />
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src="static/dist/img/default-150x150.png"
-                          alt="Product 1"
-                          className="img-circle img-size-32 mr-2"
-                        />
-                        Amazing Product
-                      </td>
-                      <td>$1,230 USD</td>
-                      <td>
-                        <small className="text-danger mr-1">
-                          <i className="fas fa-arrow-down" />
-                          3%
-                        </small>
-                        198 Sold
-                      </td>
-                      <td>
-                        <a href="#" className="text-muted">
-                          <i className="fas fa-search" />
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src="static/dist/img/default-150x150.png"
-                          alt="Product 1"
-                          className="img-circle img-size-32 mr-2"
-                        />
-                        Perfect Item
-                        <span className="badge bg-danger">NEW</span>
-                      </td>
-                      <td>$199 USD</td>
-                      <td>
-                        <small className="text-success mr-1">
-                          <i className="fas fa-arrow-up" />
-                          63%
-                        </small>
-                        87 Sold
-                      </td>
-                      <td>
-                        <a href="#" className="text-muted">
-                          <i className="fas fa-search" />
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* /.card */}
+            {/* /.login-card-body */}
           </div>
-          {/* /.col-md-6 */}
-          <div className="col-lg-6">
-            <div className="card">
-              <div className="card-header border-0">
-                <div className="d-flex justify-content-between">
-                  <h3 className="card-title">Sales</h3>
-                  <a href="javascript:void(0);">View Report</a>
-                </div>
-              </div>
-              <div className="card-body">
-                <div className="d-flex">
-                  <p className="d-flex flex-column">
-                    <span className="text-bold text-lg">$18,230.00</span>
-                    <span>Sales Over Time</span>
-                  </p>
-                  <p className="ml-auto d-flex flex-column text-right">
-                    <span className="text-success">
-                      <i className="fas fa-arrow-up" /> 33.1%
-                    </span>
-                    <span className="text-muted">Since last month</span>
-                  </p>
-                </div>
-                {/* /.d-flex */}
-                <div className="position-relative mb-4">
-                  <canvas id="sales-chart" height={200} />
-                </div>
-                <div className="d-flex flex-row justify-content-end">
-                  <span className="mr-2">
-                    <i className="fas fa-square text-primary" /> This year
-                  </span>
-                  <span>
-                    <i className="fas fa-square text-gray" /> Last year
-                  </span>
-                </div>
-              </div>
-            </div>
-            {/* /.card */}
-            <div className="card">
-              <div className="card-header border-0">
-                <h3 className="card-title">Online Store Overview</h3>
-                <div className="card-tools">
-                  <a href="#" className="btn btn-sm btn-tool">
-                    <i className="fas fa-download" />
-                  </a>
-                  <a href="#" className="btn btn-sm btn-tool">
-                    <i className="fas fa-bars" />
-                  </a>
-                </div>
-              </div>
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center border-bottom mb-3">
-                  <p className="text-success text-xl">
-                    <i className="ion ion-ios-refresh-empty" />
-                  </p>
-                  <p className="d-flex flex-column text-right">
-                    <span className="font-weight-bold">
-                      <i className="ion ion-android-arrow-up text-success" />{" "}
-                      12%
-                    </span>
-                    <span className="text-muted">CONVERSION RATE</span>
-                  </p>
-                </div>
-                {/* /.d-flex */}
-                <div className="d-flex justify-content-between align-items-center border-bottom mb-3">
-                  <p className="text-warning text-xl">
-                    <i className="ion ion-ios-cart-outline" />
-                  </p>
-                  <p className="d-flex flex-column text-right">
-                    <span className="font-weight-bold">
-                      <i className="ion ion-android-arrow-up text-warning" />{" "}
-                      0.8%
-                    </span>
-                    <span className="text-muted">SALES RATE</span>
-                  </p>
-                </div>
-                {/* /.d-flex */}
-                <div className="d-flex justify-content-between align-items-center mb-0">
-                  <p className="text-danger text-xl">
-                    <i className="ion ion-ios-people-outline" />
-                  </p>
-                  <p className="d-flex flex-column text-right">
-                    <span className="font-weight-bold">
-                      <i className="ion ion-android-arrow-down text-danger" />{" "}
-                      1%
-                    </span>
-                    <span className="text-muted">REGISTRATION RATE</span>
-                  </p>
-                </div>
-                {/* /.d-flex */}
-              </div>
-            </div>
-          </div>
-          {/* /.col-md-6 */}
         </div>
-        {/* /.row */}
       </div>
-    </AdminHOC>
   );
 }

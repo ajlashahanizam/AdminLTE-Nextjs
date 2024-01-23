@@ -15,9 +15,11 @@
     "admin-lte": "^3.2.0",
     "fullcalendar": "^6.1.10",
     "next": "14.0.4",
+    "next-auth": "^4.24.5",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^6.21.2",
-    "sass": "^1.69.7"
+    "sass": "^1.69.7",
+    "v6": "^0.0.0"
   }
 }
